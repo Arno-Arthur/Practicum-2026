@@ -1,24 +1,61 @@
-# Compiled class file
+# ========================
+#      Maven / Java
+# ========================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
-*.nar
 *.ear
+*.nar
 *.zip
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# Log files
+*.log
+logs/
+!**/src/main/resources/application*.yml
+!**/src/main/resources/application*.properties
+
+# JVM crash logs
 hs_err_pid*
 replay_pid*
+
+# ========================
+#    IntelliJ IDEA
+# ========================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# ========================
+#        macOS
+# ========================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+__MACOSX
+
+# ========================
+#       Gradle
+# ========================
+.gradle/
+build/
+
+# ========================
+#      Secrets & Local Configs
+# ========================
+*.secret
+.env
+application-local.properties
+application-dev.yml
