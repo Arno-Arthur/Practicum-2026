@@ -2,10 +2,6 @@
 #      Maven / Java
 # ========================
 target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
 *.class
 *.jar
 *.war
@@ -18,8 +14,6 @@ target/
 # Log files
 *.log
 logs/
-!**/src/main/resources/application*.yml
-!**/src/main/resources/application*.properties
 
 # JVM crash logs
 hs_err_pid*
@@ -45,12 +39,6 @@ Icon
 .Spotlight-V100
 .Trashes
 __MACOSX
-
-# ========================
-#       Gradle
-# ========================
-.gradle/
-build/
 
 # ========================
 #      Secrets & Local Configs
