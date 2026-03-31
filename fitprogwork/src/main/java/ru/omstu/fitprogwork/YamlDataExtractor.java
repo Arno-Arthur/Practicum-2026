@@ -1,20 +1,21 @@
 package ru.omstu.fitprogwork;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.stereotype.Component;
 
-@Component("json")
-public class JsonDataExtractor implements DataExtractor {
-    private final ObjectMapper mapper = new ObjectMapper();
+@Component("yaml")
+public class YamlDataExtractor implements DataExtractor {
+    private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
     @Override
     public String extractValue(String data, String path) {
         try {
-            JsonNode root = mapper.readTree(data);
+            JsonNode root = yamlMapper.readTree(data);
             return navigate(root, path).asText();
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при парсинге JSON", e);
+            throw new RuntimeException("Ошибка при парсинге YAML", e);
         }
     }
 
@@ -23,13 +24,14 @@ public class JsonDataExtractor implements DataExtractor {
         String[] parts = path.split("/");
         JsonNode current = node;
         for (String part : parts) {
+            if (part.isEmpty()) continue;
             if (part.startsWith("[") && part.endsWith("]")) {
                 int index = Integer.parseInt(part.substring(1, part.length() - 1));
                 current = current.get(index);
             } else {
                 current = current.get(part);
             }
-            if (current == null) return mapper.nullNode();
+            if (current == null) return yamlMapper.nullNode();
         }
         return current;
     }

@@ -1,29 +1,28 @@
 package ru.omstu.fitprogwork;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
-
+@Component("xml")
 public class XmlDataExtractor implements DataExtractor {
     private final XmlMapper mapper = new XmlMapper();
 
     @Override
-    public String extractValue(String filePath, String fieldPath) {
-        try (InputStream is = getClass().getResourceAsStream("/" + filePath)) {
-            JsonNode root = mapper.readTree(is);
-            JsonNode actualRoot = root.get("root");
-            if (actualRoot == null) actualRoot = root;
-            JsonNode node = navigateJson(actualRoot, fieldPath);
-            return node != null ? node.asText() : null;
+    public String extractValue(String data, String path) {
+        try {
+            JsonNode root = mapper.readTree(data);
+            // Убираем корневой элемент <root>, если он есть
+            JsonNode actualRoot = root.has("root") ? root.get("root") : root;
+            return navigate(actualRoot, path).asText();
         } catch (Exception e) {
-            throw new RuntimeException("Ошибка при чтении XML", e);
+            throw new RuntimeException("Ошибка при парсинге XML", e);
         }
     }
 
-    private JsonNode navigateJson(JsonNode node, String path) {
-        if (path == null || path.isEmpty() || "/".equals(path)) return node;
-        String[] parts = path.startsWith("/") ? path.substring(1).split("/") : path.split("/");
+    private JsonNode navigate(JsonNode node, String path) {
+        if (path == null || path.isEmpty()) return node;
+        String[] parts = path.split("/");
         JsonNode current = node;
         for (String part : parts) {
             if (part.isEmpty()) continue;
@@ -33,7 +32,7 @@ public class XmlDataExtractor implements DataExtractor {
             } else {
                 current = current.get(part);
             }
-            if (current == null) return null;
+            if (current == null) return mapper.nullNode();
         }
         return current;
     }
