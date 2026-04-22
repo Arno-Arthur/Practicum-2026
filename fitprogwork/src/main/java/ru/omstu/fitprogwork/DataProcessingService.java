@@ -4,16 +4,16 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class DataProcessingService {
 
     private static final Logger log = LoggerFactory.getLogger(DataProcessingService.class);
     private final Map<String, DataExtractor> extractors;
-    private final Map<ExtractionRequest, String> cache = new ConcurrentHashMap<>();
+    private final CacheService cacheService;
 
-    public DataProcessingService(Map<String, DataExtractor> extractorBeans) {
+    public DataProcessingService(Map<String, DataExtractor> extractorBeans, CacheService cacheService) {
+        this.cacheService = cacheService;
         this.extractors = extractorBeans.entrySet().stream()
                 .collect(java.util.stream.Collectors.toMap(
                         e -> e.getKey().replace("DataExtractor", "").toLowerCase(),
@@ -22,9 +22,10 @@ public class DataProcessingService {
     }
 
     public String extract(ExtractionRequest request) {
-        if (cache.containsKey(request)) {
+        String valueFromCache = cacheService.get(request);
+        if (valueFromCache != null) {
             log.info("Кеш HIT для запроса: type={}, path={}", request.getType(), request.getPath());
-            return cache.get(request);
+            return valueFromCache;
         }
 
         log.info("Кеш MISS для запроса: type={}, path={}", request.getType(), request.getPath());
@@ -34,7 +35,7 @@ public class DataProcessingService {
         }
 
         String result = extractor.extractValue(request.getData(), request.getPath());
-        cache.put(request, result);
+        cacheService.save(request, result);
         return result;
     }
 }
